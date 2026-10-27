@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -23,10 +25,20 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
+   //  systems
+
+   private static SwerveSubsystem drivetrain;
+
+   private static RobotContainer robotContainer;
+
   public Robot() {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    drivetrain = new SwerveSubsystem();
+    robotContainer = new RobotContainer();
   }
 
   /**
@@ -88,7 +100,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() { 
+    CommandScheduler.getInstance().cancelAll();
+  }
 
   /** This function is called periodically during test mode. */
   @Override
@@ -101,4 +115,19 @@ public class Robot extends TimedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+
+  /** Find subsystems */
+  public static SwerveSubsystem getDrivetrain() {
+    if (drivetrain == null) {
+      drivetrain = new SwerveSubsystem();
+    }
+    return drivetrain;
+  }
+
+  public static RobotContainer getRobotContainer() {
+    if (robotContainer == null) {
+      robotContainer = new RobotContainer();
+    }
+    return robotContainer;
+  }
 }
