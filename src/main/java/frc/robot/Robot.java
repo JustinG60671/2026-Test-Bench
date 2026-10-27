@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.SwerveSubsystem;
 
 /**
@@ -32,6 +34,9 @@ public class Robot extends TimedRobot {
 
    private static RobotContainer robotContainer;
 
+   private static Intake intake;
+   private static Outtake outtake;
+
   public Robot() {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
@@ -39,6 +44,9 @@ public class Robot extends TimedRobot {
 
     drivetrain = new SwerveSubsystem();
     robotContainer = new RobotContainer();
+
+    intake = new Intake();
+    outtake = new Outtake();
   }
 
   /**
@@ -130,4 +138,18 @@ public class Robot extends TimedRobot {
     }
     return robotContainer;
   }
+
+  public static Outtake getOuttake() {
+    if (outtake == null) {
+      outtake = new Outtake();
+    }
+    return outtake;
+  }
+
+  public static Intake getIntake() {
+    if (intake == null) {
+      intake = new Intake();
+    }
+    return intake;
+}
 }
