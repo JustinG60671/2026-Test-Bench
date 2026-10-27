@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.deser.impl.NullsAsEmptyProvider;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import frc.robot.vision.commands.TowerAlign;
 
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
@@ -45,7 +44,8 @@ public class RobotContainer {
 
     public static final CommandXboxController operator = new CommandXboxController(Constants.Controllers.OPERATOR_PORT);
 
-    autoChooser.addCmd("CrossStart", this::crossStart);
+    
+    AutoChooser.addCmd("CrossStart", this::crossStart);
 
     // private final AutoFactory driveAutoFactory;
     // private final AutoChooser autoChooser;

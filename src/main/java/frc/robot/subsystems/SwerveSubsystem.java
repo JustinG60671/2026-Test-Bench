@@ -4,22 +4,22 @@ import static frc.robot.Constants.Swerve.*;
 
 import java.io.IOException;
 
-// import org.json.simple.parser.ParseException;
+import org.json.simple.parser.ParseException;
 import org.opencv.core.Mat;
 
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.Swerve;
-// import frc.robot.vision.Limelight;
+import frc.robot.vision.Limelight;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.Pigeon2;
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.config.PIDConstants;
-// import com.pathplanner.lib.config.RobotConfig;
-// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-// import choreo.trajectory.SwerveSample;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -144,38 +144,38 @@ public class SwerveSubsystem extends SubsystemBase {
 
         pidRot.enableContinuousInput(-Math.PI, Math.PI);
 
-        // RobotConfig config = null;
-        // try {
-        //     config = RobotConfig.fromGUISettings();
-        // } catch (IOException | ParseException e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // }
+        RobotConfig config = null;
+        try {
+            config = RobotConfig.fromGUISettings();
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         // Configure AutoBuilder last
-        // AutoBuilder.configure(
-        //         this::getPose, // Robot pose supplier
-        //         this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-        //         this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        //         (speeds, feedforwards) -> choreoDrive(speeds, true), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-        //         new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-        //                 new PIDConstants(0.051, 0.0, 0.0), // Translation PID constants
-        //                 new PIDConstants(0.03, 0.0, 0.0) // Rotation PID constants
-        //         ),
-        //         config, // The robot configuration
-        //         () -> {
-        //         // // Boolean supplier that controls when the path will be mirrored for the red alliance
-        //         // // This will flip the path being followed to the red side of the field.
-        //         // // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+        AutoBuilder.configure(
+                this::getPose, // Robot pose supplier
+                this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> choreoDrive(speeds, true), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                        new PIDConstants(0.051, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(0.03, 0.0, 0.0) // Rotation PID constants
+                ),
+                config, // The robot configuration
+                () -> {
+                // // Boolean supplier that controls when the path will be mirrored for the red alliance
+                // // This will flip the path being followed to the red side of the field.
+                // // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-        //         // var alliance = DriverStation.getAlliance();
-        //         // if (alliance.isPresent()) {
-        //         //     return alliance.get() == DriverStation.Alliance.Red;
-        //         // }
-        //         return false;
-        //         },
-        //         this // Reference to this subsystem to set requirements
-        // );
+                // var alliance = DriverStation.getAlliance();
+                // if (alliance.isPresent()) {
+                //     return alliance.get() == DriverStation.Alliance.Red;
+                // }
+                return false;
+                },
+                this // Reference to this subsystem to set requirements
+        );
 
     }
 
@@ -187,15 +187,15 @@ public class SwerveSubsystem extends SubsystemBase {
      * 
      * @param SwerveSample Object returned by Choreo AutoFactory
      */
-    // public void followTrajectory(SwerveSample sample) {
-    //     Pose2d pose = getPose();
-    //     ChassisSpeeds speeds = new ChassisSpeeds(
-    //             sample.vx + pidX.calculate(pose.getX(), sample.x),
-    //             sample.vy + pidY.calculate(pose.getY(), sample.y),
-    //             sample.omega + pidX.calculate(pose.getRotation().getRadians(), sample.heading));
+    public void followTrajectory(SwerveSample sample) {
+        Pose2d pose = getPose();
+        ChassisSpeeds speeds = new ChassisSpeeds(
+                sample.vx + pidX.calculate(pose.getX(), sample.x),
+                sample.vy + pidY.calculate(pose.getY(), sample.y),
+                sample.omega + pidX.calculate(pose.getRotation().getRadians(), sample.heading));
 
-    //     choreoDrive(speeds, true);
-    // }
+        choreoDrive(speeds, true);
+    }
 
     /**
      * Runs every robot loop iteration. Updates odometry with the latest gyro angle
@@ -220,8 +220,8 @@ public class SwerveSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("back Right Module", backRightModule.getPosition().distanceMeters);
 
 
-        // SmartDashboard.putNumber("Limelight Distance", Robot.getLimelight().getDistanceFromAprilTagFeet());
-        // SmartDashboard.putBoolean("TY is Detected", Robot.getLimelight().getTYIsDetected());
+        SmartDashboard.putNumber("Limelight Distance", Robot.getLimelight().getDistanceFromAprilTagFeet());
+        SmartDashboard.putBoolean("TY is Detected", Robot.getLimelight().getTYIsDetected());
         SmartDashboard.putNumber("Gyro Angle", gyro.getYaw().getValueAsDouble());
         SmartDashboard.putNumber("FL Encoder Rotation", frontLeftModule.turnEncoderValue);
         SmartDashboard.putNumber("FR Encoder Rotation", frontRightModule.turnEncoderValue);
@@ -287,14 +287,19 @@ public class SwerveSubsystem extends SubsystemBase {
      *                      the Limelight
      * @param slowIntake    Whether to apply the slow nerf to the maximum speed.
      */
-    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative,boolean slowDrive) {
+    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean hubAiming,
+            boolean slowIntake, boolean slowDrive) {
         // Convert the commanded speeds into the correct units for the drivetrain
         // Convert the commanded speeds into the correct units for the drivetrain
         double rotDelivered;
         double xSpeedDelivered;
         double ySpeedDelivered;
 
-        if (slowDrive) {
+        if(slowIntake){
+            xSpeedDelivered = xSpeed * Swerve.MAX_SPEED_METERS_PER_SECOND * Constants.Swerve.SLOW_INTAKE_NERF;
+            ySpeedDelivered = ySpeed * Swerve.MAX_SPEED_METERS_PER_SECOND * Constants.Swerve.SLOW_INTAKE_NERF;
+            rotDelivered = rot * Swerve.MAX_ANGULAR_SPEED * Constants.Swerve.SLOW_INTAKE_NERF;
+        }else if (slowDrive) {
             xSpeedDelivered = xSpeed * Swerve.MAX_SPEED_METERS_PER_SECOND * Constants.Swerve.SLOW_DRIVE_NERF;
             ySpeedDelivered = ySpeed * Swerve.MAX_SPEED_METERS_PER_SECOND * Constants.Swerve.SLOW_DRIVE_NERF;
             rotDelivered = rot * Swerve.MAX_ANGULAR_SPEED * Constants.Swerve.SLOW_DRIVE_NERF;
@@ -304,7 +309,12 @@ public class SwerveSubsystem extends SubsystemBase {
             rotDelivered = rot * Swerve.MAX_ANGULAR_SPEED;
         }
 
-
+        // Override rotation with Limelight aiming if hub aiming is active
+        if (hubAiming) {
+            Robot.getLimelight().setPipeline(0);
+            rotDelivered = limelightAimRotate();
+            fieldRelative = false;
+        }
 
         // Convert chassis speeds to individual module states and desaturate to max
         // speed
@@ -505,22 +515,22 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return Rotation speed correction value, or 0.0 if no target is detected.
      */
-    // public double limelightAimRotate() {
-    //     if (Robot.getLimelight().getTXIsDetected()) {
-    //         return Robot.getLimelight().getLastValidTX() * Constants.Limelight.ROTATE_P_LIMELIGHT;
-    //     } else {
-    //         return 0.0;
-    //     }
-    // }
+    public double limelightAimRotate() {
+        if (Robot.getLimelight().getTXIsDetected()) {
+            return Robot.getLimelight().getLastValidTX() * Constants.Limelight.ROTATE_P_LIMELIGHT;
+        } else {
+            return 0.0;
+        }
+    }
 
     /**
      * Switches the Limelight to the specified pipeline.
      *
      * @param value The pipeline index to switch to.
      */
-    // public void changePipeline(int value) {
-    //     Robot.getLimelight().setPipeline(value);
-    // }
+    public void changePipeline(int value) {
+        Robot.getLimelight().setPipeline(value);
+    }
 
     /**
      * Calculates a proportional rotation correction to drive the robot back to 0
@@ -530,7 +540,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return Rotation speed correction value toward 0 degrees.
      */
     public double gyroZeroProportional() {
-        return gyroZeroError(); //* Constants.Limelight.ROTATE_P_GYRO;
+        return gyroZeroError() * Constants.Limelight.ROTATE_P_GYRO;
     }
 
     /**
@@ -558,13 +568,13 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return Strafe correction value, or 0.0 if no target is detected.
      */
-    // public double limelightTowerAlignTXCorrection() {
-    //     if (Robot.getLimelight().getTXIsDetected()) {
-    //         return limelightTowerAlignTXError() * Constants.Limelight.STRAFE_X_P;
-    //     } else {
-    //         return 0.0;
-    //     }
-    // }
+    public double limelightTowerAlignTXCorrection() {
+        if (Robot.getLimelight().getTXIsDetected()) {
+            return limelightTowerAlignTXError() * Constants.Limelight.STRAFE_X_P;
+        } else {
+            return 0.0;
+        }
+    }
 
     /**
      * Calculates a proportional forward/backward correction using the Limelight's
@@ -572,13 +582,13 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return Drive correction value, or 0.0 if no target is detected.
      */
-    // public double limelightTowerTYCorrection() {
-    //     if (Robot.getLimelight().getTYIsDetected()) {
-    //         return limelightTowerAlignTYError() * Constants.Limelight.STRAFE_Y_P;
-    //     } else {
-    //         return 0.0;
-    //     }
-    // }
+    public double limelightTowerTYCorrection() {
+        if (Robot.getLimelight().getTYIsDetected()) {
+            return limelightTowerAlignTYError() * Constants.Limelight.STRAFE_Y_P;
+        } else {
+            return 0.0;
+        }
+    }
 
     /**
      * Returns the Limelight's last valid horizontal offset (TX), used as the
@@ -586,9 +596,9 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return Horizontal TX offset in degrees.
      */
-    // public double limelightTowerAlignTXError() {
-    //     return Robot.getLimelight().getLastValidTX();
-    // }
+    public double limelightTowerAlignTXError() {
+        return Robot.getLimelight().getLastValidTX();
+    }
 
     /**
      * Returns the Limelight's last valid vertical offset (TY), used as the
@@ -596,9 +606,9 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return Vertical TY offset in degrees.
      */
-    // public double limelightTowerAlignTYError() {
-    //     return Robot.getLimelight().getLastValidTY();
-    // }
+    public double limelightTowerAlignTYError() {
+        return Robot.getLimelight().getLastValidTY();
+    }
 
     /**
      * Drives the robot straight in the x direction (forward/backward) while
@@ -618,7 +628,7 @@ public class SwerveSubsystem extends SubsystemBase {
             rotCorrection = gyro180Proportional();
         }
 
-        drive(xCorrection, 0.0, rotCorrection, true, false);
+        drive(xCorrection, 0.0, rotCorrection, true, false, false, false);
     }
 
     /**
@@ -638,7 +648,7 @@ public class SwerveSubsystem extends SubsystemBase {
             rotCorrection = gyro180Proportional();
         }
 
-        drive(0.0, yCorrection, rotCorrection, true, false);
+        drive(0.0, yCorrection, rotCorrection, true, false, false, false);
     }
 
     /**
@@ -649,7 +659,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return Rotation speed correction value toward 180 degrees.
      */
     public double gyro180Proportional() {
-        return gyro180Error();// * Constants.Limelight.ROTATE_P_GYRO;
+        return gyro180Error() * Constants.Limelight.ROTATE_P_GYRO;
     }
 
     /**
